@@ -16,7 +16,6 @@ img,svg{display:block;max-width:100%}
 main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .hidden{display:none!important}
 
-/* Header */
 .header{position:sticky;top:0;z-index:50;background:rgba(11,5,21,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .header-in{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px}
 .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.5rem;letter-spacing:.12em}
@@ -37,7 +36,6 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .promo{background:linear-gradient(90deg,var(--purple),var(--purple2));text-align:center;font-size:.85rem;padding:6px;font-weight:600}
 .promo b{color:var(--neon)}
 
-/* Hero */
 .hero{position:relative;border-radius:22px;overflow:hidden;padding:40px 32px;min-height:300px;display:flex;align-items:center;justify-content:space-between;gap:20px;
   background:linear-gradient(120deg,#2a0f5e,#4c1d95 55%,#1a0b3a);border:1px solid var(--line)}
 .hero::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 40px,rgba(255,255,255,.03) 40px 80px);pointer-events:none}
@@ -51,7 +49,6 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .hero-shirts svg:nth-child(3){margin-left:-30px;transform:rotate(6deg)}
 .hero>div{position:relative;z-index:1}
 
-/* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:999px;border:0;cursor:pointer;font-weight:700;transition:.2s;background:var(--neon);color:#150a2b}
 .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(215,255,47,.25)}
 .btn.sec{background:var(--card2);color:var(--text);border:1px solid var(--line)}
@@ -60,14 +57,12 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 .link{color:var(--purple3);text-decoration:underline;cursor:pointer;background:none;border:0}
 
-/* Categories */
 .cats{display:flex;justify-content:center;gap:22px;margin:28px 0;flex-wrap:wrap}
 .cat{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);transition:.2s}
 .cat .ring{width:84px;height:84px;border-radius:50%;border:2px solid var(--purple2);background:var(--card);display:grid;place-items:center;overflow:hidden;transition:.2s}
 .cat .ring svg{width:56px}
 .cat:hover{color:var(--neon)}.cat:hover .ring{border-color:var(--neon);transform:scale(1.06)}
 
-/* Sections / grid */
 .section{margin-top:40px}
 .section-t{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .section-t h2{font-size:1.4rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:10px}
@@ -88,7 +83,6 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .stars{--r:5;font-size:1rem;letter-spacing:2px;background:linear-gradient(90deg,var(--neon) calc(var(--r)/5*100%),#4a3873 0);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block;line-height:1}
 .rate{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.78rem}
 
-/* Filters */
 .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
 .toolbar select,.field input,.field select,.field textarea{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:0;width:100%}
 .toolbar select{width:auto}
@@ -97,7 +91,6 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .chip{padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);cursor:pointer;font-size:.85rem;transition:.2s}
 .chip.on,.chip:hover{background:var(--purple);border-color:var(--purple2)}
 
-/* Product page */
 .crumbs{color:var(--muted);font-size:.85rem;margin-bottom:16px}
 .crumbs a:hover{color:var(--neon)}
 .pdp{display:grid;grid-template-columns:1fr 1fr;gap:32px}
@@ -126,7 +119,6 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .review{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
 .review header{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.9rem}
 
-/* Cart & checkout */
 .layout2{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
 .box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
 .box h3{font-size:1.05rem;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
@@ -169,7 +161,6 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .cupom{display:flex;gap:8px;margin:12px 0}
 .cupom input{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px;outline:0;text-transform:uppercase}
 
-/* Auth */
 .auth{max-width:440px;margin:20px auto}
 .auth .box{padding:28px}
 .auth h1{font-size:1.6rem;margin-bottom:4px;text-transform:uppercase}
@@ -195,13 +186,11 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
 .qr{width:160px;height:160px;margin:0 auto;display:grid;grid-template-columns:repeat(21,1fr)}
 .qr i{background:#111}.qr i.w{background:#fff}
 
-/* Toast / modal */
 .toasts{position:fixed;bottom:20px;right:20px;display:grid;gap:10px;z-index:200}
 .toast{background:var(--card2);border:1px solid var(--purple2);border-left:4px solid var(--neon);padding:12px 18px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:in .3s}
 .toast.err{border-left-color:var(--err)}
 @keyframes in{from{opacity:0;transform:translateX(30px)}}
 
-/* Footer */
 .footer{border-top:1px solid var(--line);background:#07030e;margin-top:30px}
 .footer-in{max-width:1180px;margin:0 auto;padding:32px 16px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;font-size:.88rem;color:var(--muted)}
 .footer h4{color:var(--text);margin-bottom:10px;font-size:.9rem;text-transform:uppercase;letter-spacing:.08em}
@@ -219,7 +208,6 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
   .cart-item{grid-template-columns:70px 1fr}.cart-item .sub{grid-column:2;text-align:left}
 }
 
-/* fotos próprias dos produtos (opcional, campo "img" em js/app.js) */
 .card .img img,.pdp-img img,.ring img,.hero-shirts img{width:100%;max-height:100%;object-fit:contain}
 .th img{width:100%;height:100%;object-fit:contain}
 .hero-shirts img{width:170px}
