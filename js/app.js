@@ -1,9 +1,3 @@
-/* FINTA - loja de camisas de futebol
-   Arquivo único de JavaScript: dados + núcleo + páginas.
-   O HTML é um só (index.html); a página vem do parâmetro ?p= */
-
-/* === DADOS === */
-
 const CATEGORIAS = {
   brasileiro: 'Futebol Brasileiro',
   europeu: 'Futebol Europeu',
@@ -12,23 +6,19 @@ const CATEGORIAS = {
 
 const TAMANHOS = ['P', 'M', 'G', 'GG', 'XGG'];
 
-/* cores: [base, detalhe, acabamento] | padrao: liso, listras, faixas, central, diagonal */
 const PRODUTOS = [
-  // Brasileiro
   { id: 1, nome: 'Flamengo I 26/27 – Manga curta Versão jogador', cat: 'brasileiro', preco: 180, cores: ['#c8102e', '#111111', '#ffffff'], padrao: 'faixas', nota: 4.8, aval: 312, vendidos: 980 },
   { id: 2, nome: 'SC Inter II 26/27 – Manga curta Versão jogador', cat: 'brasileiro', preco: 180, cores: ['#ffffff', '#c8102e', '#e63946'], padrao: 'liso', nota: 4.5, aval: 198, vendidos: 870 },
   { id: 3, nome: 'Grêmio I 26/27 – Manga curta Versão torcedor', cat: 'brasileiro', preco: 180, cores: ['#0d8bd9', '#111111', '#ffffff'], padrao: 'listras', nota: 4.7, aval: 241, vendidos: 760 },
   { id: 4, nome: 'Corinthians II 26/27 – Manga curta Versão jogador', cat: 'brasileiro', preco: 180, cores: ['#111111', '#ffffff', '#ffffff'], padrao: 'liso', nota: 4.6, aval: 176, vendidos: 540 },
   { id: 5, nome: 'Palmeiras I 26/27 – Manga curta Versão torcedor', cat: 'brasileiro', preco: 180, cores: ['#0b6b3a', '#ffffff', '#d9b84a'], padrao: 'liso', nota: 4.7, aval: 205, vendidos: 610 },
   { id: 6, nome: 'Santos I 26/27 – Manga curta Versão torcedor', cat: 'brasileiro', preco: 180, cores: ['#ffffff', '#111111', '#111111'], padrao: 'liso', nota: 4.4, aval: 133, vendidos: 420 },
-  // Europeu
   { id: 7, nome: 'PSG I 26/27 – Manga curta Versão jogador', cat: 'europeu', preco: 180, cores: ['#0a1e4a', '#c8102e', '#ffffff'], padrao: 'central', nota: 4.9, aval: 402, vendidos: 1120 },
   { id: 8, nome: 'Real Madrid I 26/27 – Manga curta Versão torcedor', cat: 'europeu', preco: 180, cores: ['#ffffff', '#f1c40f', '#1d3a8a'], padrao: 'liso', nota: 4.8, aval: 388, vendidos: 1040 },
   { id: 9, nome: 'Barcelona I 26/27 – Manga curta Versão jogador', cat: 'europeu', preco: 180, cores: ['#a50044', '#004d98', '#edbb00'], padrao: 'listras', nota: 4.8, aval: 351, vendidos: 930 },
   { id: 10, nome: 'Manchester United I 26/27 – Manga curta', cat: 'europeu', preco: 180, cores: ['#da020e', '#111111', '#ffffff'], padrao: 'liso', nota: 4.6, aval: 220, vendidos: 580 },
   { id: 11, nome: 'Juventus I 26/27 – Manga curta Versão torcedor', cat: 'europeu', preco: 180, cores: ['#ffffff', '#111111', '#111111'], padrao: 'listras', nota: 4.5, aval: 168, vendidos: 450 },
   { id: 12, nome: 'Bayern de Munique I 26/27 – Manga curta', cat: 'europeu', preco: 180, cores: ['#dc052d', '#ffffff', '#0066b2'], padrao: 'liso', nota: 4.6, aval: 190, vendidos: 470 },
-  // Retrô
   { id: 13, nome: 'Seleção Brasileira 1970 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#f6d51c', '#0b7a3b', '#0b7a3b'], padrao: 'liso', nota: 5.0, aval: 97, vendidos: 360 },
   { id: 14, nome: 'Milan 1990 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#c8102e', '#111111', '#ffffff'], padrao: 'listras', nota: 4.9, aval: 84, vendidos: 310 },
   { id: 15, nome: 'Argentina 1986 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#75aadb', '#ffffff', '#111111'], padrao: 'listras', nota: 4.9, aval: 121, vendidos: 400 },
@@ -46,8 +36,6 @@ const AVALIACOES = [
   { nome: 'Juliana P.', nota: 5, txt: 'Presente para o meu pai e ele amou. Embalagem impecável.' }
 ];
 
-/* Foto própria do produto (opcional): coloque o arquivo em images/ e preencha o campo "img" no produto,
-   por exemplo  img: 'images/flamengo-1.jpg'. Sem "img" (ou se a foto não carregar), usa o desenho gerado abaixo. */
 function camisa(p) {
   if (!p.img) return jerseySVG(p);
   return `<img src="${esc(p.img)}" alt="${esc(p.nome)}" data-pid="${p.id}" loading="lazy">`;
@@ -57,17 +45,15 @@ document.addEventListener('error', e => {
   if (i && i.tagName === 'IMG' && i.dataset.pid) { const p = prod(i.dataset.pid); if (p) i.outerHTML = jerseySVG(p); }
 }, true);
 
-/* Gera a camisa em SVG a partir das cores/padrão do produto.
-   Desenho original, inspirado no estilo das camisas de clube (tecido, dobras, golas, costuras), sem escudos nem marcas reais. */
 function jerseySVG(p) {
   const [c1, c2, c3] = p.cores;
   const uid = 'j' + p.id + Math.floor(Math.random() * 1e5);
   const lum = h => { const n = parseInt(h.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000; };
   const clara = lum(c1) > 150;
   const gola = p.gola || (p.cat === 'retro' ? ['polo', 'redonda'][p.id % 2] : ['v', 'redonda', 'polo'][p.id % 3]);
-  const fundo = gola === 'v' ? 54 : gola === 'redonda' ? 38 : 30;      /* profundidade do decote */
+  const fundo = gola === 'v' ? 54 : gola === 'redonda' ? 38 : 30;
   const OUT = `M92 14 L58 28 L12 62 L34 110 L62 96 L62 226 Q120 238 178 226 L178 96 L206 110 L228 62 L182 28 L148 14 Q120 ${fundo} 92 14 Z`;
-  const dk = clara ? .55 : 1;                                           /* sombras mais leves em camisa clara */
+  const dk = clara ? .55 : 1;
 
   let pat = '';
   if (p.padrao === 'listras') {
@@ -79,11 +65,9 @@ function jerseySVG(p) {
   } else if (p.padrao === 'diagonal') {
     pat = `<polygon points="0,80 240,170 240,206 0,116" fill="${c2}"/><polygon points="0,116 240,206 240,222 0,132" fill="${c3}"/>`;
   } else {
-    /* liso: faixas diagonais tom sobre tom, como nas camisas sublimadas modernas */
     for (let k = -4; k < 8; k++) pat += `<rect x="${k * 44}" y="-20" width="20" height="300" fill="${clara ? '#000' : '#fff'}" opacity=".045" transform="rotate(24 120 125)"/>`;
   }
 
-  /* gola */
   const miolo = c2 === c3 ? c1 : c2;
   let golaSVG = `<path d="M92 14 Q120 4 148 14 Q120 ${fundo} 92 14 Z" fill="${c1}"/><path d="M92 14 Q120 4 148 14 Q120 ${fundo} 92 14 Z" fill="#000" opacity=".38"/>`;
   if (gola === 'polo') {
@@ -158,8 +142,6 @@ function jerseySVG(p) {
 </svg>`;
 }
 
-/* === NÚCLEO === */
-
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const BRL = n => Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -167,7 +149,6 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const qs = k => new URLSearchParams(location.search).get(k);
 const prod = id => PRODUTOS.find(p => p.id === Number(id));
 const PAGE = qs('p') || 'home';
-/* só aceita redirecionamento para dentro do próprio site */
 const nextSeguro = d => { const n = qs('next') || ''; return n.startsWith('index.html') ? n : d; };
 
 const store = {
@@ -184,7 +165,6 @@ const ICON = {
   crown: '<svg viewBox="0 0 64 64" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-linejoin="round"><path d="M8 48 4 18l15 14 13-22 13 22 15-14-4 30z" fill="rgba(139,92,246,.25)"/><path d="M8 54h48"/></svg>'
 };
 
-/* ---------- UI ---------- */
 function toast(msg, tipo = '') {
   let box = $('.toasts');
   if (!box) { box = document.createElement('div'); box.className = 'toasts'; document.body.appendChild(box); }
@@ -208,7 +188,6 @@ function cardHTML(p, tag = '') {
   </article>`;
 }
 
-/* ---------- Carrinho ---------- */
 const Cart = {
   items() { return store.get('finta_cart', []); },
   save(i) { store.set('finta_cart', i); renderBadge(); },
@@ -249,7 +228,6 @@ const Cart = {
   }
 };
 
-/* Frete simulado por região do CEP */
 function calcFrete(cep) {
   const d = String(cep).replace(/\D/g, '');
   if (d.length !== 8) return null;
@@ -262,7 +240,6 @@ function calcFrete(cep) {
   ];
 }
 
-/* ---------- Autenticação (demo: dados ficam no navegador) ---------- */
 async function hash(txt) {
   try {
     const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
@@ -300,7 +277,6 @@ const Orders = {
   add(o) { const l = store.get('finta_orders', []); l.unshift(o); store.set('finta_orders', l); }
 };
 
-/* ---------- Validadores / máscaras ---------- */
 const mask = {
   cpf: v => v.replace(/\D/g, '').slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2'),
   cep: v => v.replace(/\D/g, '').slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2'),
@@ -339,7 +315,6 @@ async function buscaCEP(cep) {
   } catch { return null; }
 }
 
-/* ---------- Cabeçalho e rodapé ---------- */
 function renderBadge() { $$('.js-cart-count').forEach(b => { const n = Cart.count(); b.textContent = n || ''; b.dataset.n = n; }); }
 
 function renderLayout() {
@@ -379,14 +354,12 @@ function renderLayout() {
     <div><h4>Ajuda</h4><a href="#">Trocas e devoluções</a><a href="#">Tabela de medidas</a><a href="#">Fale conosco</a></div>
   </div><div class="copy">© ${new Date().getFullYear()} FINTA · Site de demonstração — pagamentos e pedidos são simulados.</div></footer>`;
 
-/* === PÁGINAS === */
   renderBadge();
 }
 document.addEventListener('DOMContentLoaded', renderLayout);
 const PAGES = {};
 const view = () => $('#view');
 
-/* ================= HOME ================= */
 PAGES.home = () => {
   const q = (qs('q') || '').trim().toLowerCase();
   const cat = qs('cat');
@@ -444,7 +417,6 @@ PAGES.home = () => {
     ${sec('Retrô', porCat('retro'))}`;
 };
 
-/* ================= PRODUTO ================= */
 PAGES.produto = () => {
   const p = prod(qs('id'));
   const v = view();
@@ -504,7 +476,6 @@ PAGES.produto = () => {
   };
 };
 
-/* ================= CARRINHO ================= */
 PAGES.carrinho = () => {
   const v = view();
   const draw = () => {
@@ -566,7 +537,6 @@ PAGES.carrinho = () => {
   draw();
 };
 
-/* ================= LOGIN / CADASTRO ================= */
 PAGES.login = () => {
   if (Auth.user()) { location.replace(nextSeguro('index.html?p=conta')); return; }
   const next = nextSeguro('index.html?p=conta');
@@ -605,7 +575,6 @@ PAGES.login = () => {
   draw();
 };
 
-/* ================= CHECKOUT ================= */
 PAGES.checkout = () => {
   const u = Auth.user();
   if (!u) { location.replace('index.html?p=login&next=' + encodeURIComponent('index.html?p=checkout')); return; }
@@ -742,7 +711,6 @@ PAGES.checkout = () => {
   };
 };
 
-/* ================= PEDIDO ================= */
 function etapaPedido(o) { return o.pago ? Math.min(4, 1 + Math.floor((Date.now() - o.pagoEm) / 60000)) : 0; }
 PAGES.pedido = () => {
   const u = Auth.user();
@@ -797,7 +765,6 @@ PAGES.pedido = () => {
   draw();
 };
 
-/* ================= CONTA ================= */
 PAGES.conta = () => {
   const u = Auth.user();
   if (!u) { location.replace('index.html?p=login&next=' + encodeURIComponent('index.html?p=conta')); return; }
