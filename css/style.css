@@ -218,3 +218,9 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:24px 16px 48px}
   .field.s3,.field.s2,.field.s4{grid-column:span 6}
   .cart-item{grid-template-columns:70px 1fr}.cart-item .sub{grid-column:2;text-align:left}
 }
+
+/* fotos próprias dos produtos (opcional, campo "img" em js/app.js) */
+.card .img img,.pdp-img img,.ring img,.hero-shirts img{width:100%;max-height:100%;object-fit:contain}
+.th img{width:100%;height:100%;object-fit:contain}
+.hero-shirts img{width:170px}
+@media(max-width:700px){.hero-shirts img{width:110px}}

@@ -1,4 +1,335 @@
-/* FINTA - lógica de cada página */
+/* FINTA - loja de camisas de futebol
+   Arquivo único de JavaScript: dados + núcleo + páginas.
+   O HTML é um só (index.html); a página vem do parâmetro ?p= */
+
+/* === DADOS === */
+
+const CATEGORIAS = {
+  brasileiro: 'Futebol Brasileiro',
+  europeu: 'Futebol Europeu',
+  retro: 'Retrô'
+};
+
+const TAMANHOS = ['P', 'M', 'G', 'GG', 'XGG'];
+
+/* cores: [base, detalhe, acabamento] | padrao: liso, listras, faixas, central, diagonal */
+const PRODUTOS = [
+  // Brasileiro
+  { id: 1, nome: 'Flamengo I 26/27 – Manga curta Versão jogador', cat: 'brasileiro', preco: 180, cores: ['#c8102e', '#111111', '#ffffff'], padrao: 'faixas', nota: 4.8, aval: 312, vendidos: 980 },
+  { id: 2, nome: 'SC Inter II 26/27 – Manga curta Versão jogador', cat: 'brasileiro', preco: 180, cores: ['#ffffff', '#c8102e', '#e63946'], padrao: 'liso', nota: 4.5, aval: 198, vendidos: 870 },
+  { id: 3, nome: 'Grêmio I 26/27 – Manga curta Versão torcedor', cat: 'brasileiro', preco: 180, cores: ['#0d8bd9', '#111111', '#ffffff'], padrao: 'listras', nota: 4.7, aval: 241, vendidos: 760 },
+  { id: 4, nome: 'Corinthians II 26/27 – Manga curta Versão jogador', cat: 'brasileiro', preco: 180, cores: ['#111111', '#ffffff', '#ffffff'], padrao: 'liso', nota: 4.6, aval: 176, vendidos: 540 },
+  { id: 5, nome: 'Palmeiras I 26/27 – Manga curta Versão torcedor', cat: 'brasileiro', preco: 180, cores: ['#0b6b3a', '#ffffff', '#d9b84a'], padrao: 'liso', nota: 4.7, aval: 205, vendidos: 610 },
+  { id: 6, nome: 'Santos I 26/27 – Manga curta Versão torcedor', cat: 'brasileiro', preco: 180, cores: ['#ffffff', '#111111', '#111111'], padrao: 'liso', nota: 4.4, aval: 133, vendidos: 420 },
+  // Europeu
+  { id: 7, nome: 'PSG I 26/27 – Manga curta Versão jogador', cat: 'europeu', preco: 180, cores: ['#0a1e4a', '#c8102e', '#ffffff'], padrao: 'central', nota: 4.9, aval: 402, vendidos: 1120 },
+  { id: 8, nome: 'Real Madrid I 26/27 – Manga curta Versão torcedor', cat: 'europeu', preco: 180, cores: ['#ffffff', '#f1c40f', '#1d3a8a'], padrao: 'liso', nota: 4.8, aval: 388, vendidos: 1040 },
+  { id: 9, nome: 'Barcelona I 26/27 – Manga curta Versão jogador', cat: 'europeu', preco: 180, cores: ['#a50044', '#004d98', '#edbb00'], padrao: 'listras', nota: 4.8, aval: 351, vendidos: 930 },
+  { id: 10, nome: 'Manchester United I 26/27 – Manga curta', cat: 'europeu', preco: 180, cores: ['#da020e', '#111111', '#ffffff'], padrao: 'liso', nota: 4.6, aval: 220, vendidos: 580 },
+  { id: 11, nome: 'Juventus I 26/27 – Manga curta Versão torcedor', cat: 'europeu', preco: 180, cores: ['#ffffff', '#111111', '#111111'], padrao: 'listras', nota: 4.5, aval: 168, vendidos: 450 },
+  { id: 12, nome: 'Bayern de Munique I 26/27 – Manga curta', cat: 'europeu', preco: 180, cores: ['#dc052d', '#ffffff', '#0066b2'], padrao: 'liso', nota: 4.6, aval: 190, vendidos: 470 },
+  // Retrô
+  { id: 13, nome: 'Seleção Brasileira 1970 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#f6d51c', '#0b7a3b', '#0b7a3b'], padrao: 'liso', nota: 5.0, aval: 97, vendidos: 360 },
+  { id: 14, nome: 'Milan 1990 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#c8102e', '#111111', '#ffffff'], padrao: 'listras', nota: 4.9, aval: 84, vendidos: 310 },
+  { id: 15, nome: 'Argentina 1986 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#75aadb', '#ffffff', '#111111'], padrao: 'listras', nota: 4.9, aval: 121, vendidos: 400 },
+  { id: 16, nome: 'Holanda 1988 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#ff6a13', '#ffffff', '#111111'], padrao: 'liso', nota: 4.8, aval: 76, vendidos: 250 },
+  { id: 17, nome: 'Flamengo 1981 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#c8102e', '#111111', '#ffffff'], padrao: 'faixas', nota: 5.0, aval: 143, vendidos: 520 },
+  { id: 18, nome: 'Barcelona 2009 – Retrô Manga curta', cat: 'retro', preco: 250, cores: ['#a50044', '#004d98', '#edbb00'], padrao: 'diagonal', nota: 4.9, aval: 109, vendidos: 340 }
+];
+
+const DESCRICAO_BASE = 'Camisa de torcedor com tecido leve e respirável, escudo bordado e acabamento premium. Modelagem confortável para o dia a dia e para a arquibancada. Consulte a tabela de tamanhos: se estiver entre dois números, recomendamos o maior.';
+
+const AVALIACOES = [
+  { nome: 'Rafael M.', nota: 5, txt: 'Qualidade absurda, chegou antes do prazo e o tecido é muito bom.' },
+  { nome: 'Camila S.', nota: 5, txt: 'Igualzinha às fotos. Tamanho veio certinho, recomendo!' },
+  { nome: 'Bruno T.', nota: 4, txt: 'Muito boa, só achei a manga um pouco justa. Entrega rápida.' },
+  { nome: 'Juliana P.', nota: 5, txt: 'Presente para o meu pai e ele amou. Embalagem impecável.' }
+];
+
+/* Foto própria do produto (opcional): coloque o arquivo em images/ e preencha o campo "img" no produto,
+   por exemplo  img: 'images/flamengo-1.jpg'. Sem "img" (ou se a foto não carregar), usa o desenho gerado abaixo. */
+function camisa(p) {
+  if (!p.img) return jerseySVG(p);
+  return `<img src="${esc(p.img)}" alt="${esc(p.nome)}" data-pid="${p.id}" loading="lazy">`;
+}
+document.addEventListener('error', e => {
+  const i = e.target;
+  if (i && i.tagName === 'IMG' && i.dataset.pid) { const p = prod(i.dataset.pid); if (p) i.outerHTML = jerseySVG(p); }
+}, true);
+
+/* Gera a camisa em SVG a partir das cores/padrão do produto (desenho original, sem escudos nem marcas de clubes) */
+function jerseySVG(p) {
+  const [c1, c2, c3] = p.cores;
+  const uid = 'j' + p.id + Math.floor(Math.random() * 1e5);
+  const lum = h => { const n = parseInt(h.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000; };
+  const clara = lum(c1) > 150;
+  const OUT = 'M92 14 L58 28 L12 62 L34 110 L62 96 L62 226 Q120 238 178 226 L178 96 L206 110 L228 62 L182 28 L148 14 Q120 54 92 14 Z';
+  let pat = '';
+  if (p.padrao === 'listras') {
+    for (let k = -3; k <= 3; k++) pat += `<rect x="${108 + k * 48}" y="0" width="24" height="250" fill="${c2}"/>`;
+  } else if (p.padrao === 'faixas') {
+    for (let i = 0; i < 7; i++) pat += `<rect x="0" y="${24 + i * 34}" width="240" height="17" fill="${c2}"/>`;
+  } else if (p.padrao === 'central') {
+    pat = `<rect x="102" y="0" width="36" height="250" fill="${c2}"/><rect x="111" y="0" width="18" height="250" fill="${c3}"/>`;
+  } else if (p.padrao === 'diagonal') {
+    pat = `<polygon points="0,80 240,170 240,206 0,116" fill="${c2}"/><polygon points="0,116 240,206 240,222 0,132" fill="${c3}"/>`;
+  }
+  const miolo = c2 === c3 ? c1 : c2;
+  return `<svg viewBox="0 0 240 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(p.nome)}">
+  <defs>
+    <clipPath id="${uid}c"><path d="${OUT}"/></clipPath>
+    <linearGradient id="${uid}x" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="${clara ? .22 : .38}"/><stop offset=".2" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="${clara ? .22 : .38}"/>
+    </linearGradient>
+    <radialGradient id="${uid}r" cx=".5" cy=".18" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".24"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <pattern id="${uid}t" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="1.1" fill="${clara ? '#000' : '#fff'}" opacity="${clara ? .05 : .07}"/></pattern>
+  </defs>
+  <ellipse cx="120" cy="240" rx="82" ry="6" fill="#000" opacity=".25"/>
+  <g clip-path="url(#${uid}c)">
+    <rect width="240" height="250" fill="${c1}"/>${pat}
+    <rect width="240" height="250" fill="url(#${uid}t)"/>
+    <rect width="240" height="250" fill="url(#${uid}x)"/>
+    <rect width="240" height="250" fill="url(#${uid}r)"/>
+    <polygon points="12,62 34,110 44.7,104.6 22.7,56.6" fill="${c3}"/>
+    <polygon points="228,62 206,110 195.3,104.6 217.3,56.6" fill="${c3}"/>
+    <path d="M62 98 Q55 62 58 28 M178 98 Q185 62 182 28 M62 104 V226 M178 104 V226" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="1.2"/>
+    <rect x="58" y="221" width="124" height="6" fill="${c3}" opacity=".9"/>
+  </g>
+  <path d="${OUT}" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M92 14 Q120 54 148 14" fill="none" stroke="${c3}" stroke-width="8" stroke-linecap="round"/>
+  <path d="M95 18 Q120 54 145 18" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4"/>
+  <path d="M138 56 h20 v13 q0 11 -10 15 q-10 -4 -10 -15 z" fill="${c3}" stroke="rgba(0,0,0,.4)" stroke-width=".9"/>
+  <path d="M142 60 h12 v9 q0 7 -6 10 q-6 -3 -6 -10 z" fill="${miolo}"/>
+  <rect x="84" y="60" width="14" height="3" rx="1.5" fill="${c3}" opacity=".85"/>
+</svg>`;
+}
+
+/* === NÚCLEO === */
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const BRL = n => Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const qs = k => new URLSearchParams(location.search).get(k);
+const prod = id => PRODUTOS.find(p => p.id === Number(id));
+const PAGE = qs('p') || 'home';
+/* só aceita redirecionamento para dentro do próprio site */
+const nextSeguro = d => { const n = qs('next') || ''; return n.startsWith('index.html') ? n : d; };
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } },
+  del(k) { try { localStorage.removeItem(k); } catch { } }
+};
+
+const ICON = {
+  home: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg>',
+  cart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM1 2v2h2l3.6 7.6-1.4 2.4A2 2 0 0 0 7 17h12v-2H7.4l1.1-2h7.5a2 2 0 0 0 1.7-1l3.6-6.5A1 1 0 0 0 20.4 4H5.2l-.9-2z"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3.2"/><path d="M5.8 19c1.5-3 4-4 6.2-4s4.7 1 6.2 4"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="20" height="20"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  crown: '<svg viewBox="0 0 64 64" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-linejoin="round"><path d="M8 48 4 18l15 14 13-22 13 22 15-14-4 30z" fill="rgba(139,92,246,.25)"/><path d="M8 54h48"/></svg>'
+};
+
+/* ---------- UI ---------- */
+function toast(msg, tipo = '') {
+  let box = $('.toasts');
+  if (!box) { box = document.createElement('div'); box.className = 'toasts'; document.body.appendChild(box); }
+  const t = document.createElement('div');
+  t.className = 'toast ' + tipo; t.textContent = msg;
+  box.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+const stars = n => `<span class="stars" style="--r:${n}" aria-label="${n} de 5">★★★★★</span>`;
+
+function cardHTML(p, tag = '') {
+  return `<article class="card">
+    ${tag ? `<span class="tag">${tag}</span>` : ''}
+    <a href="index.html?p=produto&id=${p.id}" class="img">${camisa(p)}</a>
+    <div class="info">
+      <a href="index.html?p=produto&id=${p.id}" class="nome">${esc(p.nome)}</a>
+      <div class="rate">${stars(p.nota)} <span>${p.nota.toFixed(1)} (${p.aval})</span></div>
+      <div class="preco">${BRL(p.preco)}<small>ou 3x ${BRL(p.preco / 3)}</small></div>
+      <div class="add"><a class="btn sec" href="index.html?p=produto&id=${p.id}">Ver produto</a></div>
+    </div>
+  </article>`;
+}
+
+/* ---------- Carrinho ---------- */
+const Cart = {
+  items() { return store.get('finta_cart', []); },
+  save(i) { store.set('finta_cart', i); renderBadge(); },
+  add(id, tam, qtd = 1) {
+    const it = this.items();
+    const f = it.find(x => x.id === id && x.tam === tam);
+    if (f) f.qtd = Math.min(10, f.qtd + qtd); else it.push({ id, tam, qtd });
+    this.save(it);
+  },
+  setQty(id, tam, qtd) {
+    let it = this.items();
+    it = it.map(x => (x.id === id && x.tam === tam) ? { ...x, qtd: Math.max(1, Math.min(10, qtd)) } : x);
+    this.save(it);
+  },
+  remove(id, tam) { this.save(this.items().filter(x => !(x.id === id && x.tam === tam))); },
+  clear() { store.del('finta_cart'); store.del('finta_cupom'); store.del('finta_frete'); renderBadge(); },
+  count() { return this.items().reduce((s, x) => s + x.qtd, 0); },
+  detailed() { return this.items().map(x => ({ ...x, p: prod(x.id) })).filter(x => x.p); },
+  subtotal() { return this.detailed().reduce((s, x) => s + x.p.preco * x.qtd, 0); },
+  cupom() { return store.get('finta_cupom', null); },
+  desconto() {
+    const c = this.cupom(); if (!c) return 0;
+    return c.codigo === 'FINTA10' ? this.subtotal() * 0.10 : 0;
+  },
+  frete() { return store.get('finta_frete', null); },
+  freteValor() {
+    const f = this.frete(); if (!f) return 0;
+    const c = this.cupom();
+    if (c && c.codigo === 'FRETEGRATIS') return 0;
+    if (f.id === 'eco' && this.subtotal() >= 400) return 0;
+    return f.valor;
+  },
+  total() { return Math.max(0, this.subtotal() - this.desconto() + this.freteValor()); },
+  aplicarCupom(cod) {
+    cod = cod.trim().toUpperCase();
+    if (!['FINTA10', 'FRETEGRATIS'].includes(cod)) return false;
+    store.set('finta_cupom', { codigo: cod }); return true;
+  }
+};
+
+/* Frete simulado por região do CEP */
+function calcFrete(cep) {
+  const d = String(cep).replace(/\D/g, '');
+  if (d.length !== 8) return null;
+  const r = Number(d[0]);
+  const base = { 9: 14.9, 8: 17.9, 7: 29.9, 6: 34.9, 5: 27.9, 4: 27.9, 3: 22.9, 2: 21.9, 1: 21.9, 0: 21.9 }[r];
+  const dias = { 9: 3, 8: 4, 7: 7, 6: 9, 5: 8, 4: 8, 3: 5, 2: 5, 1: 5, 0: 5 }[r];
+  return [
+    { id: 'eco', nome: 'Econômico', valor: base, prazo: dias + 2 },
+    { id: 'exp', nome: 'Expresso', valor: +(base * 1.8).toFixed(2), prazo: Math.max(1, dias - 2) }
+  ];
+}
+
+/* ---------- Autenticação (demo: dados ficam no navegador) ---------- */
+async function hash(txt) {
+  try {
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
+    return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+  } catch {
+    let h = 5381; for (const c of txt) h = ((h << 5) + h + c.charCodeAt(0)) >>> 0; return 'f' + h;
+  }
+}
+const Auth = {
+  users() { return store.get('finta_users', []); },
+  user() { const id = store.get('finta_session', null); return this.users().find(u => u.id === id) || null; },
+  async register({ nome, email, senha }) {
+    email = email.trim().toLowerCase();
+    const us = this.users();
+    if (us.some(u => u.email === email)) return { erro: 'Este e-mail já está cadastrado.' };
+    const u = { id: Date.now(), nome: nome.trim(), email, hash: await hash(email + senha), cpf: '', tel: '', end: null };
+    us.push(u); store.set('finta_users', us); store.set('finta_session', u.id);
+    return { ok: u };
+  },
+  async login(email, senha) {
+    email = email.trim().toLowerCase();
+    const u = this.users().find(x => x.email === email);
+    if (!u || u.hash !== await hash(email + senha)) return { erro: 'E-mail ou senha incorretos.' };
+    store.set('finta_session', u.id); return { ok: u };
+  },
+  logout() { store.del('finta_session'); },
+  update(patch) {
+    const us = this.users(); const u = this.user(); if (!u) return;
+    Object.assign(us.find(x => x.id === u.id), patch); store.set('finta_users', us);
+  }
+};
+const Orders = {
+  all() { const u = Auth.user(); return u ? store.get('finta_orders', []).filter(o => o.uid === u.id) : []; },
+  get(id) { return store.get('finta_orders', []).find(o => o.id === id); },
+  add(o) { const l = store.get('finta_orders', []); l.unshift(o); store.set('finta_orders', l); }
+};
+
+/* ---------- Validadores / máscaras ---------- */
+const mask = {
+  cpf: v => v.replace(/\D/g, '').slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2'),
+  cep: v => v.replace(/\D/g, '').slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2'),
+  tel: v => v.replace(/\D/g, '').slice(0, 11).replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2'),
+  card: v => v.replace(/\D/g, '').slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 '),
+  val: v => v.replace(/\D/g, '').slice(0, 4).replace(/(\d{2})(\d)/, '$1/$2'),
+  cvv: v => v.replace(/\D/g, '').slice(0, 4)
+};
+function validCPF(c) {
+  c = c.replace(/\D/g, ''); if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+  for (let t = 9; t < 11; t++) {
+    let s = 0; for (let i = 0; i < t; i++) s += c[i] * (t + 1 - i);
+    if (((s * 10) % 11) % 10 != c[t]) return false;
+  }
+  return true;
+}
+function luhn(n) {
+  n = n.replace(/\D/g, ''); if (n.length < 13) return false;
+  let s = 0, alt = false;
+  for (let i = n.length - 1; i >= 0; i--) { let d = +n[i]; if (alt) { d *= 2; if (d > 9) d -= 9; } s += d; alt = !alt; }
+  return s % 10 === 0;
+}
+function bindMasks(root = document) {
+  $$('[data-mask]', root).forEach(i => i.addEventListener('input', () => { i.value = mask[i.dataset.mask](i.value); }));
+}
+function setErr(input, msg) {
+  const f = input.closest('.field'); if (!f) return;
+  f.classList.toggle('bad', !!msg);
+  const e = $('.err', f); if (e) e.textContent = msg || '';
+}
+async function buscaCEP(cep) {
+  const d = cep.replace(/\D/g, ''); if (d.length !== 8) return null;
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${d}/json/`);
+    const j = await r.json(); return j.erro ? null : j;
+  } catch { return null; }
+}
+
+/* ---------- Cabeçalho e rodapé ---------- */
+function renderBadge() { $$('.js-cart-count').forEach(b => { const n = Cart.count(); b.textContent = n || ''; b.dataset.n = n; }); }
+
+function renderLayout() {
+  const u = Auth.user();
+  const pg = PAGE;
+  const cat = qs('cat');
+  const h = $('#app-header');
+  if (h) h.innerHTML = `
+  <div class="promo">Use o cupom <b>FINTA10</b> e ganhe 10% OFF · Frete econômico grátis acima de <b>R$ 400</b></div>
+  <header class="header">
+    <div class="header-in">
+      <a href="index.html" class="logo" aria-label="FINTA - início">${ICON.crown}<div>FIN<span>TA</span></div></a>
+      <form class="search" action="index.html" method="get" role="search">
+        <input name="q" type="search" placeholder="Buscar camisas, times, retrô..." value="${esc(qs('q') || '')}" aria-label="Buscar">
+        <button aria-label="Buscar">${ICON.search}</button>
+      </form>
+      <nav class="nav">
+        <a class="icon-btn" href="index.html" title="Início">${ICON.home}</a>
+        <a class="icon-btn" href="${u ? 'index.html?p=conta' : 'index.html?p=login'}" title="${u ? 'Minha conta' : 'Entrar'}">${ICON.user}</a>
+        <a class="icon-btn" href="index.html?p=carrinho" title="Carrinho">${ICON.cart}<span class="badge js-cart-count"></span></a>
+      </nav>
+    </div>
+    <div class="subnav">
+      <a href="index.html" class="${pg === 'home' && !cat && !qs('q') ? 'on' : ''}">Início</a>
+      <a href="index.html?cat=todos" class="${cat === 'todos' ? 'on' : ''}">Todas as camisas</a>
+      ${Object.entries(CATEGORIAS).map(([k, v]) => `<a href="index.html?cat=${k}" class="${cat === k ? 'on' : ''}">${v}</a>`).join('')}
+      <a href="index.html?p=conta&tab=pedidos">Meus pedidos</a>
+    </div>
+  </header>`;
+  const f = $('#app-footer');
+  if (f) f.innerHTML = `
+  <footer class="footer"><div class="footer-in">
+    <div><div class="logo" style="margin-bottom:10px">${ICON.crown}<div>FIN<span>TA</span></div></div>
+      <p>As melhores camisas de futebol do Brasil, da Europa e clássicos retrô. Qualidade premium, envio para todo o país.</p></div>
+    <div><h4>Loja</h4>${Object.entries(CATEGORIAS).map(([k, v]) => `<a href="index.html?cat=${k}">${v}</a>`).join('')}</div>
+    <div><h4>Conta</h4><a href="index.html?p=login">Entrar</a><a href="index.html?p=conta&tab=pedidos">Meus pedidos</a><a href="index.html?p=carrinho">Carrinho</a></div>
+    <div><h4>Ajuda</h4><a href="#">Trocas e devoluções</a><a href="#">Tabela de medidas</a><a href="#">Fale conosco</a></div>
+  </div><div class="copy">© ${new Date().getFullYear()} FINTA · Site de demonstração — pagamentos e pedidos são simulados.</div></footer>`;
+
+/* === PÁGINAS === */
+  renderBadge();
+}
+document.addEventListener('DOMContentLoaded', renderLayout);
 const PAGES = {};
 const view = () => $('#view');
 
@@ -48,10 +379,10 @@ PAGES.home = () => {
         <p>Camisas de clubes e seleções, versões jogador e torcedor, retrôs lendários. Entrega para todo o Brasil.</p>
         <a class="btn" href="index.html?cat=todos">Ver todas as camisas</a>
       </div>
-      <div class="hero-shirts">${[7, 1, 3].map(id => jerseySVG(prod(id))).join('')}</div>
+      <div class="hero-shirts">${[7, 1, 3].map(id => camisa(prod(id))).join('')}</div>
     </section>
     <div class="cats">
-      ${[['brasileiro', 1], ['europeu', 7], ['retro', 13]].map(([k, id]) => `<a class="cat" href="index.html?cat=${k}"><div class="ring">${jerseySVG(prod(id))}</div>${CATEGORIAS[k]}</a>`).join('')}
+      ${[['brasileiro', 1], ['europeu', 7], ['retro', 13]].map(([k, id]) => `<a class="cat" href="index.html?cat=${k}"><div class="ring">${camisa(prod(id))}</div>${CATEGORIAS[k]}</a>`).join('')}
       <a class="cat" href="index.html?cat=todos"><div class="ring" style="font-size:1.6rem;color:var(--neon)">＋</div>Ver tudo</a>
     </div>
     ${sec('Mais vendidos', top, '🔥 Top')}
@@ -71,7 +402,7 @@ PAGES.produto = () => {
   v.innerHTML = `
     <div class="crumbs"><a href="index.html">Início</a> › <a href="index.html?cat=${p.cat}">${CATEGORIAS[p.cat]}</a> › ${esc(p.nome)}</div>
     <div class="pdp">
-      <div class="pdp-img">${jerseySVG(p)}</div>
+      <div class="pdp-img">${camisa(p)}</div>
       <div>
         <h1>${esc(p.nome)}</h1>
         <div class="rate" style="margin:8px 0">${stars(p.nota)} <span>${p.nota.toFixed(1)} · ${p.aval} avaliações · ${p.vendidos}+ vendidos</span></div>
@@ -113,7 +444,7 @@ PAGES.produto = () => {
     Cart.add(p.id, tam, qtd); return true;
   };
   $('#add').onclick = () => { if (adicionar()) toast('Adicionado ao carrinho ✔'); };
-  $('#comprar').onclick = () => { if (adicionar()) location.href = 'carrinho.html'; };
+  $('#comprar').onclick = () => { if (adicionar()) location.href = 'index.html?p=carrinho'; };
   $('#calc').onclick = () => {
     const op = calcFrete($('#cep').value);
     $('#frete-res').innerHTML = op ? op.map(o => `<div class="sum-line"><span>${o.nome} · ${o.prazo} dias úteis</span><b>${BRL(o.valor)}</b></div>`).join('') : '<span style="color:var(--err)">CEP inválido.</span>';
@@ -135,7 +466,7 @@ PAGES.carrinho = () => {
       <div class="layout2">
         <div class="box">${its.map(x => `
           <div class="cart-item">
-            <a href="produto.html?id=${x.p.id}" class="th">${jerseySVG(x.p)}</a>
+            <a href="index.html?p=produto&id=${x.p.id}" class="th">${camisa(x.p)}</a>
             <div><h4>${esc(x.p.nome)}</h4><div class="meta">Tamanho ${x.tam} · ${BRL(x.p.preco)} un.</div>
               <div class="qty"><button data-a="menos" data-id="${x.id}" data-t="${x.tam}">−</button><span>${x.qtd}</span><button data-a="mais" data-id="${x.id}" data-t="${x.tam}">+</button></div></div>
             <div><div class="sub">${BRL(x.p.preco * x.qtd)}</div><button class="rm" data-a="rm" data-id="${x.id}" data-t="${x.tam}">Remover</button></div>
@@ -152,7 +483,7 @@ PAGES.carrinho = () => {
           <div class="field" style="margin-bottom:12px"><label>Calcular frete</label>
             <div class="row"><input id="cep" data-mask="cep" placeholder="00000-000" value="${f && f.cep ? mask.cep(f.cep) : ''}" inputmode="numeric"><button class="btn sec" id="calc">OK</button></div>
             <div id="fopts" style="margin-top:8px"></div></div>
-          <a class="btn block" href="checkout.html">Finalizar compra</a>
+          <a class="btn block" href="index.html?p=checkout">Finalizar compra</a>
           <a class="btn sec block" style="margin-top:10px" href="index.html?cat=todos">Continuar comprando</a>
         </aside>
       </div>`;
@@ -184,8 +515,8 @@ PAGES.carrinho = () => {
 
 /* ================= LOGIN / CADASTRO ================= */
 PAGES.login = () => {
-  if (Auth.user()) { location.replace(qs('next') || 'conta.html'); return; }
-  const next = qs('next') || 'conta.html';
+  if (Auth.user()) { location.replace(nextSeguro('index.html?p=conta')); return; }
+  const next = nextSeguro('index.html?p=conta');
   let modo = qs('modo') === 'cadastro' ? 'cadastro' : 'login';
   const v = view();
   const draw = () => {
@@ -224,8 +555,8 @@ PAGES.login = () => {
 /* ================= CHECKOUT ================= */
 PAGES.checkout = () => {
   const u = Auth.user();
-  if (!u) { location.replace('login.html?next=checkout.html'); return; }
-  if (!Cart.count()) { location.replace('carrinho.html'); return; }
+  if (!u) { location.replace('index.html?p=login&next=' + encodeURIComponent('index.html?p=checkout')); return; }
+  if (!Cart.count()) { location.replace('index.html?p=carrinho'); return; }
   const v = view();
   const e = u.end || {};
   v.innerHTML = `
@@ -268,7 +599,7 @@ PAGES.checkout = () => {
       </div>
       <aside class="box" style="position:sticky;top:130px"><h3>Resumo do pedido</h3><div id="resumo"></div>
         <button class="btn block" id="fim" style="margin-top:14px">Confirmar pedido</button>
-        <a class="link" href="carrinho.html" style="display:block;text-align:center;margin-top:10px">Voltar ao carrinho</a>
+        <a class="link" href="index.html?p=carrinho" style="display:block;text-align:center;margin-top:10px">Voltar ao carrinho</a>
       </aside>
     </form>`;
   const f = $('#co');
@@ -281,7 +612,7 @@ PAGES.checkout = () => {
     const sub = Cart.subtotal(), desc = Cart.desconto(), fr = Cart.freteValor();
     const dPix = pix ? (sub - desc) * 0.05 : 0;
     const total = sub - desc - dPix + fr;
-    $('#resumo').innerHTML = Cart.detailed().map(x => `<div class="mini-item"><div class="th">${jerseySVG(x.p)}</div><div class="grow">${esc(x.p.nome.split('–')[0])}<br><small style="color:var(--muted)">Tam. ${x.tam} · ${x.qtd}x</small></div><b>${BRL(x.p.preco * x.qtd)}</b></div>`).join('') + `
+    $('#resumo').innerHTML = Cart.detailed().map(x => `<div class="mini-item"><div class="th">${camisa(x.p)}</div><div class="grow">${esc(x.p.nome.split('–')[0])}<br><small style="color:var(--muted)">Tam. ${x.tam} · ${x.qtd}x</small></div><b>${BRL(x.p.preco * x.qtd)}</b></div>`).join('') + `
       <div class="sum-line" style="margin-top:8px"><span>Subtotal</span><span>${BRL(sub)}</span></div>
       ${desc ? `<div class="sum-line"><span>Cupom</span><span class="ok">− ${BRL(desc)}</span></div>` : ''}
       ${dPix ? `<div class="sum-line"><span>Desconto Pix</span><span class="ok">− ${BRL(dPix)}</span></div>` : ''}
@@ -354,7 +685,7 @@ PAGES.checkout = () => {
     $('#fim').disabled = true; $('#fim').textContent = 'Processando...';
     await new Promise(r => setTimeout(r, 900));
     Orders.add(pedido); Cart.clear();
-    location.href = 'pedido.html?id=' + pedido.id + '&novo=1';
+    location.href = 'index.html?p=pedido&id=' + pedido.id + '&novo=1';
   };
 };
 
@@ -362,10 +693,10 @@ PAGES.checkout = () => {
 function etapaPedido(o) { return o.pago ? Math.min(4, 1 + Math.floor((Date.now() - o.pagoEm) / 60000)) : 0; }
 PAGES.pedido = () => {
   const u = Auth.user();
-  if (!u) { location.replace('login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search)); return; }
+  if (!u) { location.replace('index.html?p=login&next=' + encodeURIComponent('index.html' + location.search)); return; }
   const o = Orders.get(qs('id'));
   const v = view();
-  if (!o || o.uid !== u.id) { v.innerHTML = `<div class="empty"><h3>Pedido não encontrado</h3><a class="btn" href="conta.html?tab=pedidos">Meus pedidos</a></div>`; return; }
+  if (!o || o.uid !== u.id) { v.innerHTML = `<div class="empty"><h3>Pedido não encontrado</h3><a class="btn" href="index.html?p=conta&tab=pedidos">Meus pedidos</a></div>`; return; }
   const nomes = ['Pedido realizado', 'Pagamento aprovado', 'Em separação', 'Enviado', 'Entregue'];
   const draw = () => {
     const s = etapaPedido(o);
@@ -389,7 +720,7 @@ PAGES.pedido = () => {
       <div class="timeline">${nomes.map((n, i) => `<div class="tl ${i <= s ? 'done' : ''}"><i></i>${n}</div>`).join('')}</div>
       ${cobranca}
       <div class="layout2">
-        <div class="box"><h3>Itens</h3>${o.itens.map(i => `<div class="mini-item"><div class="th">${jerseySVG(prod(i.id))}</div><div class="grow">${esc(i.nome)}<br><small style="color:var(--muted)">Tam. ${i.tam} · ${i.qtd}x ${BRL(i.preco)}</small></div><b>${BRL(i.preco * i.qtd)}</b></div>`).join('')}</div>
+        <div class="box"><h3>Itens</h3>${o.itens.map(i => `<div class="mini-item"><div class="th">${camisa(prod(i.id))}</div><div class="grow">${esc(i.nome)}<br><small style="color:var(--muted)">Tam. ${i.tam} · ${i.qtd}x ${BRL(i.preco)}</small></div><b>${BRL(i.preco * i.qtd)}</b></div>`).join('')}</div>
         <aside class="box"><h3>Detalhes</h3>
           <div class="sum-line"><span>Data</span><span>${new Date(o.data).toLocaleString('pt-BR')}</span></div>
           <div class="sum-line"><span>Pagamento</span><span>${pagTxt}</span></div>
@@ -398,7 +729,7 @@ PAGES.pedido = () => {
           <div class="sum-line"><span>Frete (${o.freteNome})</span><span>${o.frete ? BRL(o.frete) : 'Grátis'}</span></div>
           <div class="sum-line total"><span>Total</span><b>${BRL(o.total)}</b></div>
           <p style="color:var(--muted);font-size:.85rem;margin-top:12px"><b style="color:var(--text)">Entrega:</b> ${esc(o.end.rua)}, ${esc(o.end.num)}${o.end.comp ? ' – ' + esc(o.end.comp) : ''} · ${esc(o.end.bairro)}, ${esc(o.end.cidade)}/${esc(o.end.uf)} · CEP ${esc(o.end.cep)}<br>Prazo: até ${o.prazo} dias úteis</p>
-          <a class="btn sec block" style="margin-top:14px" href="conta.html?tab=pedidos">Meus pedidos</a>
+          <a class="btn sec block" style="margin-top:14px" href="index.html?p=conta&tab=pedidos">Meus pedidos</a>
         </aside>
       </div>`;
     const sim = $('#simular');
@@ -416,7 +747,7 @@ PAGES.pedido = () => {
 /* ================= CONTA ================= */
 PAGES.conta = () => {
   const u = Auth.user();
-  if (!u) { location.replace('login.html?next=conta.html'); return; }
+  if (!u) { location.replace('index.html?p=login&next=' + encodeURIComponent('index.html?p=conta')); return; }
   let tab = qs('tab') || 'pedidos';
   const v = view();
   const draw = () => {
@@ -436,7 +767,7 @@ PAGES.conta = () => {
         const s = etapaPedido(o);
         return `<div class="order"><header><div><b>Pedido #${o.id}</b><div style="color:var(--muted);font-size:.85rem">${new Date(o.data).toLocaleDateString('pt-BR')} · ${o.itens.reduce((a, i) => a + i.qtd, 0)} item(ns)</div></div>
           <div style="text-align:right"><span class="status ${s === 4 ? 'ok' : ''}">${['Aguardando pagamento', 'Pago', 'Em separação', 'Enviado', 'Entregue'][s]}</span><div style="font-weight:800;color:var(--neon);margin-top:4px">${BRL(o.total)}</div></div></header>
-          <div style="display:flex;gap:8px;align-items:center">${o.itens.slice(0, 4).map(i => `<div class="th" style="width:52px;background:#150a2b;border-radius:8px;padding:3px">${jerseySVG(prod(i.id))}</div>`).join('')}<a class="btn sec" style="margin-left:auto" href="pedido.html?id=${o.id}">Ver detalhes</a></div></div>`;
+          <div style="display:flex;gap:8px;align-items:center">${o.itens.slice(0, 4).map(i => `<div class="th" style="width:52px;background:#150a2b;border-radius:8px;padding:3px">${camisa(prod(i.id))}</div>`).join('')}<a class="btn sec" style="margin-left:auto" href="index.html?p=pedido&id=${o.id}">Ver detalhes</a></div></div>`;
       }).join('') : `<div class="empty"><h3>Nenhum pedido ainda</h3><p style="margin-bottom:16px">Quando você comprar, seu histórico aparece aqui.</p><a class="btn" href="index.html?cat=todos">Ir às compras</a></div>`;
     } else if (tab === 'dados') {
       const e2 = us.end || {};
@@ -480,4 +811,4 @@ PAGES.conta = () => {
   draw();
 };
 
-document.addEventListener('DOMContentLoaded', () => { const fn = PAGES[document.body.dataset.page]; if (fn) fn(); });
+document.addEventListener('DOMContentLoaded', () => { (PAGES[PAGE] || PAGES.home)(); });
