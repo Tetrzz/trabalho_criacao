@@ -277,11 +277,31 @@ const Orders = {
   add(o) { const l = store.get('finta_orders', []); l.unshift(o); store.set('finta_orders', l); }
 };
 
+const BANDEIRAS = [
+  { id: 'visa', nome: 'Visa' },
+  { id: 'mastercard', nome: 'Mastercard' },
+  { id: 'elo', nome: 'Elo' },
+  { id: 'amex', nome: 'American Express' },
+  { id: 'hipercard', nome: 'Hipercard' }
+];
+function bandeira(n) {
+  n = String(n).replace(/\D/g, '');
+  if (/^(401178|401179|431274|438935|451416|457393|457631|457632|504175|506699|5067|509\d|627780|636297|636368|650\d|6516|6550)/.test(n)) return 'elo';
+  if (/^(606282|3841)/.test(n)) return 'hipercard';
+  if (/^3[47]/.test(n)) return 'amex';
+  if (/^(5[1-5]|222[1-9]|22[3-9]\d|2[3-6]\d\d|27[01]\d|2720)/.test(n)) return 'mastercard';
+  if (/^4/.test(n)) return 'visa';
+  return null;
+}
 const mask = {
   cpf: v => v.replace(/\D/g, '').slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2'),
   cep: v => v.replace(/\D/g, '').slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2'),
   tel: v => v.replace(/\D/g, '').slice(0, 11).replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2'),
-  card: v => v.replace(/\D/g, '').slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 '),
+  card: v => {
+    const d = v.replace(/\D/g, '');
+    if (bandeira(d) === 'amex') return d.slice(0, 15).replace(/^(\d{4})(\d{1,6})/, '$1 $2').replace(/^(\d{4} \d{6})(\d{1,5})/, '$1 $2');
+    return d.slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 ');
+  },
   val: v => v.replace(/\D/g, '').slice(0, 4).replace(/(\d{2})(\d)/, '$1/$2'),
   cvv: v => v.replace(/\D/g, '').slice(0, 4)
 };
@@ -610,7 +630,7 @@ PAGES.checkout = () => {
             <label class="opt"><input type="radio" name="pag" value="boleto"><span class="grow">Boleto bancário<small>Vencimento em 3 dias</small></span></label>
           </div>
           <div id="cartao-box" class="form hidden">
-            <div class="field"><label>Número do cartão</label><input name="cnum" data-mask="card" placeholder="0000 0000 0000 0000" inputmode="numeric" autocomplete="cc-number"><span class="err"></span></div>
+            <div class="field"><label>Número do cartão</label><input name="cnum" data-mask="card" placeholder="0000 0000 0000 0000" inputmode="numeric" autocomplete="cc-number"><div class="brands" id="brands">${BANDEIRAS.map(b => `<span data-b="${b.id}">${b.nome}</span>`).join('')}</div><span class="err"></span></div>
             <div class="field"><label>Nome impresso</label><input name="cnome" autocomplete="cc-name"><span class="err"></span></div>
             <div class="field s2"><label>Validade</label><input name="cval" data-mask="val" placeholder="MM/AA" inputmode="numeric" autocomplete="cc-exp"><span class="err"></span></div>
             <div class="field s2"><label>CVV</label><input name="ccvv" data-mask="cvv" placeholder="123" inputmode="numeric" autocomplete="cc-csc"><span class="err"></span></div>
@@ -626,6 +646,15 @@ PAGES.checkout = () => {
     </form>`;
   const f = $('#co');
   bindMasks(v);
+  const marcaBandeira = () => {
+    const b = bandeira(f.cnum.value);
+    $$('#brands span').forEach(x => x.classList.toggle('on', x.dataset.b === b));
+    $('#brands').classList.toggle('has', !!b);
+    f.ccvv.placeholder = b === 'amex' ? '1234' : '123';
+    f.ccvv.maxLength = b === 'amex' ? 4 : 3;
+    f.ccvv.value = f.ccvv.value.slice(0, f.ccvv.maxLength);
+  };
+  f.cnum.addEventListener('input', marcaBandeira);
   let opcoes = [];
 
   const pagamento = () => f.pag.value;
@@ -687,7 +716,7 @@ PAGES.checkout = () => {
       chk('cnum', luhn(f.cnum.value), 'Número de cartão inválido.');
       chk('cnome', f.cnome.value.trim().length > 2, 'Informe o nome impresso.');
       chk('cval', mm >= 1 && mm <= 12 && (aa > ano || (aa === ano && mm >= agora.getMonth() + 1)), 'Validade inválida.');
-      chk('ccvv', f.ccvv.value.length >= 3, 'CVV inválido.');
+      chk('ccvv', f.ccvv.value.length === (bandeira(f.cnum.value) === 'amex' ? 4 : 3), 'CVV inválido.');
     }
     if (!ok) { toast('Revise os campos destacados.', 'err'); first && first.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
 
@@ -702,7 +731,8 @@ PAGES.checkout = () => {
       cupom: Cart.cupom()?.codigo || null, frete: Cart.freteValor(), freteNome: Cart.frete().nome, prazo: Cart.frete().prazo,
       total, pag, parcelas: pag === 'cartao' ? +f.parc.value : 1, end,
       pago: pag === 'cartao', pagoEm: pag === 'cartao' ? Date.now() : null,
-      cartao: pag === 'cartao' ? '**** ' + f.cnum.value.replace(/\D/g, '').slice(-4) : null
+      cartao: pag === 'cartao' ? '**** ' + f.cnum.value.replace(/\D/g, '').slice(-4) : null,
+      bandeira: pag === 'cartao' ? (BANDEIRAS.find(b => b.id === bandeira(f.cnum.value)) || {}).nome || null : null
     };
     $('#fim').disabled = true; $('#fim').textContent = 'Processando...';
     await new Promise(r => setTimeout(r, 900));
@@ -721,7 +751,7 @@ PAGES.pedido = () => {
   const nomes = ['Pedido realizado', 'Pagamento aprovado', 'Em separação', 'Enviado', 'Entregue'];
   const draw = () => {
     const s = etapaPedido(o);
-    const pagTxt = { pix: 'Pix', cartao: `Cartão ${o.cartao} em ${o.parcelas}x`, boleto: 'Boleto bancário' }[o.pag];
+    const pagTxt = { pix: 'Pix', cartao: `Cartão ${o.bandeira ? o.bandeira + ' ' : ''}${o.cartao} em ${o.parcelas}x`, boleto: 'Boleto bancário' }[o.pag];
     let cobranca = '';
     if (!o.pago && o.pag === 'pix') {
       let seed = [...o.id].reduce((a, c) => a + c.charCodeAt(0), 0), cells = '';
