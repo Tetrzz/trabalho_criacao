@@ -57,13 +57,18 @@ document.addEventListener('error', e => {
   if (i && i.tagName === 'IMG' && i.dataset.pid) { const p = prod(i.dataset.pid); if (p) i.outerHTML = jerseySVG(p); }
 }, true);
 
-/* Gera a camisa em SVG a partir das cores/padrão do produto (desenho original, sem escudos nem marcas de clubes) */
+/* Gera a camisa em SVG a partir das cores/padrão do produto.
+   Desenho original, inspirado no estilo das camisas de clube (tecido, dobras, golas, costuras), sem escudos nem marcas reais. */
 function jerseySVG(p) {
   const [c1, c2, c3] = p.cores;
   const uid = 'j' + p.id + Math.floor(Math.random() * 1e5);
   const lum = h => { const n = parseInt(h.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000; };
   const clara = lum(c1) > 150;
-  const OUT = 'M92 14 L58 28 L12 62 L34 110 L62 96 L62 226 Q120 238 178 226 L178 96 L206 110 L228 62 L182 28 L148 14 Q120 54 92 14 Z';
+  const gola = p.gola || (p.cat === 'retro' ? ['polo', 'redonda'][p.id % 2] : ['v', 'redonda', 'polo'][p.id % 3]);
+  const fundo = gola === 'v' ? 54 : gola === 'redonda' ? 38 : 30;      /* profundidade do decote */
+  const OUT = `M92 14 L58 28 L12 62 L34 110 L62 96 L62 226 Q120 238 178 226 L178 96 L206 110 L228 62 L182 28 L148 14 Q120 ${fundo} 92 14 Z`;
+  const dk = clara ? .55 : 1;                                           /* sombras mais leves em camisa clara */
+
   let pat = '';
   if (p.padrao === 'listras') {
     for (let k = -3; k <= 3; k++) pat += `<rect x="${108 + k * 48}" y="0" width="24" height="250" fill="${c2}"/>`;
@@ -73,32 +78,80 @@ function jerseySVG(p) {
     pat = `<rect x="102" y="0" width="36" height="250" fill="${c2}"/><rect x="111" y="0" width="18" height="250" fill="${c3}"/>`;
   } else if (p.padrao === 'diagonal') {
     pat = `<polygon points="0,80 240,170 240,206 0,116" fill="${c2}"/><polygon points="0,116 240,206 240,222 0,132" fill="${c3}"/>`;
+  } else {
+    /* liso: faixas diagonais tom sobre tom, como nas camisas sublimadas modernas */
+    for (let k = -4; k < 8; k++) pat += `<rect x="${k * 44}" y="-20" width="20" height="300" fill="${clara ? '#000' : '#fff'}" opacity=".045" transform="rotate(24 120 125)"/>`;
   }
+
+  /* gola */
   const miolo = c2 === c3 ? c1 : c2;
+  let golaSVG = `<path d="M92 14 Q120 4 148 14 Q120 ${fundo} 92 14 Z" fill="${c1}"/><path d="M92 14 Q120 4 148 14 Q120 ${fundo} 92 14 Z" fill="#000" opacity=".38"/>`;
+  if (gola === 'polo') {
+    golaSVG += `
+    <rect x="115" y="30" width="10" height="46" fill="${c1}"/><rect x="115" y="30" width="10" height="46" fill="#000" opacity=".12"/>
+    <rect x="115" y="30" width="10" height="46" fill="none" stroke="${c3}" stroke-width="1.4"/>
+    <circle cx="120" cy="44" r="2" fill="${c3}"/><circle cx="120" cy="58" r="2" fill="${c3}"/>
+    <path d="M92 14 L119 34 L111 52 L83 28 Z" fill="${c3}"/><path d="M148 14 L121 34 L129 52 L157 28 Z" fill="${c3}"/>
+    <path d="M92 14 L119 34 L111 52 L83 28 Z M148 14 L121 34 L129 52 L157 28 Z" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="1"/>`;
+  } else {
+    golaSVG += `<path d="M92 14 Q120 ${fundo} 148 14" fill="none" stroke="${c3}" stroke-width="${gola === 'v' ? 8 : 10}" stroke-linecap="round"/>
+    <path d="M95 18 Q120 ${fundo} 145 18" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.4"/>
+    <path d="M90 12 Q120 ${fundo - 2} 150 12" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1" stroke-dasharray="2 2.4"/>`;
+  }
+
   return `<svg viewBox="0 0 240 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(p.nome)}">
   <defs>
     <clipPath id="${uid}c"><path d="${OUT}"/></clipPath>
+    <filter id="${uid}b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="${uid}s" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
     <linearGradient id="${uid}x" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="${clara ? .22 : .38}"/><stop offset=".2" stop-color="#000" stop-opacity="0"/>
-      <stop offset=".8" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="${clara ? .22 : .38}"/>
+      <stop offset="0" stop-color="#000" stop-opacity="${.4 * dk}"/><stop offset=".16" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".84" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="${.4 * dk}"/>
     </linearGradient>
-    <radialGradient id="${uid}r" cx=".5" cy=".18" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".24"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${uid}y" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="${.22 * dk}"/>
+    </linearGradient>
+    <linearGradient id="${uid}m" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity="${.3 * dk}"/>
+    </linearGradient>
     <pattern id="${uid}t" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="1.1" fill="${clara ? '#000' : '#fff'}" opacity="${clara ? .05 : .07}"/></pattern>
+    <pattern id="${uid}d" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="#000" opacity="${clara ? .1 : .18}"/><circle cx="3" cy="3" r=".7" fill="#000" opacity="${clara ? .1 : .18}"/></pattern>
   </defs>
-  <ellipse cx="120" cy="240" rx="82" ry="6" fill="#000" opacity=".25"/>
+
+  <ellipse cx="120" cy="241" rx="84" ry="6" fill="#000" opacity=".3" filter="url(#${uid}s)"/>
+
   <g clip-path="url(#${uid}c)">
     <rect width="240" height="250" fill="${c1}"/>${pat}
+    <rect width="240" height="250" fill="url(#${uid}d)"/>
     <rect width="240" height="250" fill="url(#${uid}t)"/>
     <rect width="240" height="250" fill="url(#${uid}x)"/>
-    <rect width="240" height="250" fill="url(#${uid}r)"/>
+    <rect width="240" height="250" fill="url(#${uid}y)"/>
+
+    <polygon points="58,28 12,62 34,110 62,96" fill="url(#${uid}m)"/>
+    <polygon points="182,28 228,62 206,110 178,96" fill="#000" opacity="${.14 * dk}"/>
+
+    <g filter="url(#${uid}b)">
+      <path d="M72 118 Q104 150 90 204" fill="none" stroke="#000" stroke-width="12" opacity="${.13 * dk}"/>
+      <path d="M168 124 Q138 156 150 206" fill="none" stroke="#fff" stroke-width="12" opacity=".1"/>
+      <path d="M72 156 Q120 176 168 156" fill="none" stroke="#000" stroke-width="9" opacity="${.09 * dk}"/>
+      <path d="M96 40 Q120 58 144 40" fill="none" stroke="#000" stroke-width="10" opacity="${.12 * dk}"/>
+      <ellipse cx="62" cy="100" rx="10" ry="14" fill="#000" opacity="${.3 * dk}"/>
+      <ellipse cx="178" cy="100" rx="10" ry="14" fill="#000" opacity="${.3 * dk}"/>
+    </g>
+
     <polygon points="12,62 34,110 44.7,104.6 22.7,56.6" fill="${c3}"/>
     <polygon points="228,62 206,110 195.3,104.6 217.3,56.6" fill="${c3}"/>
-    <path d="M62 98 Q55 62 58 28 M178 98 Q185 62 182 28 M62 104 V226 M178 104 V226" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="1.2"/>
-    <rect x="58" y="221" width="124" height="6" fill="${c3}" opacity=".9"/>
+    <path d="M22.7 56.6 L44.7 104.6 M217.3 56.6 L195.3 104.6" stroke="#000" stroke-opacity=".25" stroke-width="1" fill="none"/>
+
+    <path d="M62 98 Q55 62 58 28 M178 98 Q185 62 182 28 M62 104 V226 M178 104 V226" fill="none" stroke="#000" stroke-opacity=".16" stroke-width="1.2"/>
+    <rect x="58" y="221" width="124" height="7" fill="${c3}" opacity=".92"/>
+    <path d="M60 219 H180" stroke="#fff" stroke-opacity=".35" stroke-width=".9" stroke-dasharray="2 2.2"/>
+    <path d="M62 226 Q120 238 178 226" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="1.4"/>
   </g>
-  <path d="${OUT}" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="1.6" stroke-linejoin="round"/>
-  <path d="M92 14 Q120 54 148 14" fill="none" stroke="${c3}" stroke-width="8" stroke-linecap="round"/>
-  <path d="M95 18 Q120 54 145 18" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.4"/>
+
+  <path d="${OUT}" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="1.6" stroke-linejoin="round"/>
+  ${golaSVG}
+
   <path d="M138 56 h20 v13 q0 11 -10 15 q-10 -4 -10 -15 z" fill="${c3}" stroke="rgba(0,0,0,.4)" stroke-width=".9"/>
   <path d="M142 60 h12 v9 q0 7 -6 10 q-6 -3 -6 -10 z" fill="${miolo}"/>
   <rect x="84" y="60" width="14" height="3" rx="1.5" fill="${c3}" opacity=".85"/>
